@@ -1,0 +1,18 @@
+name: filebeat
+path.config: ${CONFIG_DIR}
+
+filebeat.modules:
+  - module: zeek
+    capture_loss:
+      enabled: true
+      var.paths: ['/logs/zeek/capture_loss.log']
+    connection:
+      enabled: true
+      var.paths: ['/logs/zeek/conn.log']
+
+output.logstash:
+  enabled: true
+  hosts: ['logstash:5045']
+  ssl.certificate_authorities: ['${CONFIG_DIR}/ca.crt']
+  ssl.certificate: '${CONFIG_DIR}/filebeat.crt'
+  ssl.key: '${CONFIG_DIR}/filebeat.key'
