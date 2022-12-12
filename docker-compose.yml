@@ -208,7 +208,7 @@ services:
   arkime:
     container_name: arkime
     build:
-      context: /arkime
+      context: ./arkime
       args:
         - ELASTIC_USERNAME=${ELASTIC_USERNAME}
         - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
