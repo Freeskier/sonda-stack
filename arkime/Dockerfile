@@ -44,7 +44,7 @@ RUN rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/cache/* && \
 ADD /scripts /data/
 ADD /config/config.ini /data/config.ini
 
-RUN chmod 755 /data/*.sh
+RUN chmod 755 /data/startarkime.sh
 
 
 EXPOSE 8005

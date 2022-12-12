@@ -208,7 +208,7 @@ services:
   arkime:
     container_name: arkime
     build:
-      context: ./arkime
+      context: arkime
       args:
         - ELASTIC_USERNAME=${ELASTIC_USERNAME}
         - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
@@ -229,7 +229,7 @@ services:
     network_mode: 'host'
     volumes:
       - geoip:/usr/share/GeoIP
-      - ./arkime/scripts/startarkime.sh:/data/startarkime.sh
+      # - ./arkime/scripts/startarkime.sh:/data/startarkime.sh
       - ./arkime/logs:/data/logs:rw
       - ./arkime/pcap:/data/pcap:rw
       - ./arkime/config/config.ini:/data/config.ini:rw
