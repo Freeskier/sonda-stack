@@ -57,7 +57,7 @@ else
     if [ "$old_ver" != "$newer_ver" ]; then
         echo "Upgrading OS database..."
         #echo -e "$ARKIME_LOCALELASTICSEARCH\n$ARKIME_INET" | $ARKIMEDIR/bin/Configure
-        $ARKIMEDIR/db/db.pl --clientcert ${ARKIME_DIR}/config/arkime.crt --clientkey ${ARKIME_DIR}/config/arkime.key --insecure --esuser $ELASTIC_USERNAME:$ELASTIC_PASSWORD https://localhost:$OS_PORT upgradenoprompt
+        $ARKIMEDIR/db/db.pl --clientcert ${ARKIME_DIR}/config/arkime.crt --clientkey ${ARKIME_DIR}/config/arkime.key --insecure --esuser $ELASTIC_USERNAME:$ELASTIC_PASSWORD https://localhost:$ES_PORT upgradenoprompt
         echo $ARKIME_VERSION > $ARKIMEDIR/etc/.initialized
     fi
 fi
