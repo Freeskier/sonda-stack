@@ -27,6 +27,10 @@ secrets:
     file: ./secrets/certificates/filebeat/filebeat.key
   filebeat.cert:
     file: ./secrets/certificates/filebeat/filebeat.crt
+  arkime.key:
+    file: ./secrets/certificates/arkime/arkime.key
+  arkime.cert:
+    file: ./secrets/certificates/arkime/arkime.crt
 
 services:
   elasticsearch:
@@ -171,6 +175,7 @@ services:
     volumes:
       - ./filebeat/config/filebeat.yml:${FILEBEAT_DIR}/filebeat.yml:ro
       - ./zeek/logs:/logs/zeek:ro
+      - ./suricata/logs:/logs/suricata:ro
     secrets:
       - source: ca.crt
         target: ${FILEBEAT_DIR}/config/ca.crt
@@ -202,11 +207,21 @@ services:
 
   arkime:
     container_name: arkime
-    build: /arkime
+    build:
+      context: /arkime
+      args:
+        - ELASTIC_USERNAME=${ELASTIC_USERNAME}
+        - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
+        - ARKIME_DIR=${ARKIME_DIR}
+        - HOST_INTERFACE=${HOST_INTERFACE}
     restart: unless-stopped
     secrets:
       - source: ca.crt
-        target: ${FILEBEAT_DIR}/config/ca.crt
+        target: ${ARKIME_DIR}/config/ca.crt
+      - source: arkime.cert
+        target: ${ARKIME_DIR}/config/arkime.crt
+      - source: arkime.key
+        target: ${ARKIME_DIR}/config/arkime.key
     cap_add:
       - NET_ADMIN
       - NET_RAW
@@ -214,6 +229,26 @@ services:
     network_mode: 'host'
     volumes:
       - geoip:/usr/share/GeoIP
+      - ./arkime/scripts/startarkime.sh:/data/startarkime.sh
+      - ./arkime/logs:/data/logs:rw
+      - ./arkime/pcap:/data/pcap:rw
+      - ./arkime/config/config.ini:/data/config.ini:rw
+    depends_on:
+      - elasticsearch
+
+  suricata:
+    container_name: suricata
+    image: jasonish/suricata:latest
+    volumes:
+      - ./suricata/logs:/var/log/suricata
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+      - SYS_NICE
+    network_mode: 'host'
+    command: -i ${HOST_INTERFACE}
+    depends_on:
+      - filebeat
 
   geoip:
     container_name: geoip
@@ -233,4 +268,3 @@ volumes:
 networks:
   elk:
     driver: bridge
-#curl --cacert ${CONFIG_DIR}/ca.crt -X POST -H "Content-Type: application/json" https://elastic:123qweASD@localhost:9200/_security/api_key -d '{"name":"test3"}'
