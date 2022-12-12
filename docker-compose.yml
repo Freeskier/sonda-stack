@@ -200,6 +200,21 @@ services:
     depends_on:
       - filebeat
 
+  arkime:
+    container_name: arkime
+    build: /arkime
+    restart: unless-stopped
+    secrets:
+      - source: ca.crt
+        target: ${FILEBEAT_DIR}/config/ca.crt
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+      - SYS_NICE
+    network_mode: 'host'
+    volumes:
+      - geoip:/usr/share/GeoIP
+
   geoip:
     container_name: geoip
     image: maxmindinc/geoipupdate:latest
@@ -218,3 +233,4 @@ volumes:
 networks:
   elk:
     driver: bridge
+#curl --cacert ${CONFIG_DIR}/ca.crt -X POST -H "Content-Type: application/json" https://elastic:123qweASD@localhost:9200/_security/api_key -d '{"name":"test3"}'

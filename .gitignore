@@ -2,3 +2,4 @@
 .initialized
 eve.json
 *.pcap.gz
+/secrets
