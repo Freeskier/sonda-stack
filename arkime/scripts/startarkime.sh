@@ -1,5 +1,7 @@
 #!/bin/bash
 
+export ES_PORT=9200
+
 echo "Giving OS time to start..."
 until curl --cacert ${ARKIME_DIR}/config/ca.crt -sS "https://$ELASTIC_USERNAME:$ELASTIC_PASSWORD@localhost:$ES_PORT/_cluster/health?wait_for_status=yellow" > /dev/null 2>&1
 do
