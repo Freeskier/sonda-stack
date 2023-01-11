@@ -46,10 +46,11 @@ services:
       ELASTIC_USERNAME: ${ELASTIC_USERNAME}
       ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
       ES_JAVA_OPTS: -Xmx${ELASTICSEARCH_HEAP} -Xms${ELASTICSEARCH_HEAP}
-      bootstrap.memory_lock: 'true'
+      #bootstrap.memory_lock: 'true'
       discovery.type: single-node
       path.data: ${ELASTIC_DIR}/data
-      path.logs: ${ELASTIC_DIR}/logs
+      #path.logs: ${ELASTIC_DIR}/logs
+      ingest.geoip.downloader.enabled: 'false'
     volumes:
       - ${ELASTIC_DATA_PATH}:${ELASTIC_DIR}/data
       - ${LOGS_PATH}/elasticsearch:${ELASTIC_DIR}/logs
