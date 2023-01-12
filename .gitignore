@@ -3,3 +3,4 @@
 eve.json
 *.pcap.gz
 /secrets
+/rita/mongo

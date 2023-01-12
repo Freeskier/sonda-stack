@@ -31,6 +31,10 @@ secrets:
     file: ./secrets/certificates/arkime/arkime.key
   arkime.cert:
     file: ./secrets/certificates/arkime/arkime.crt
+  rita_web.key:
+    file: ./secrets/certificates/rita_web/rita_web.key
+  rita_web.cert:
+    file: ./secrets/certificates/rita_web/rita_web.crt
 
 services:
   elasticsearch:
@@ -49,11 +53,11 @@ services:
       #bootstrap.memory_lock: 'true'
       discovery.type: single-node
       path.data: ${ELASTIC_DIR}/data
-      #path.logs: ${ELASTIC_DIR}/logs
+      path.logs: ${ELASTIC_DIR}/logs
       ingest.geoip.downloader.enabled: 'false'
     volumes:
-      - ${ELASTIC_DATA_PATH}:${ELASTIC_DIR}/data
-      - ${LOGS_PATH}/elasticsearch:${ELASTIC_DIR}/logs
+      - ${ELASTIC_DATA_PATH}:${ELASTIC_DIR}/data:rw
+      - ${LOGS_PATH}/elasticsearch:${ELASTIC_DIR}/logs:rw
       - ./elasticsearch/config/elasticsearch.yml:${ELASTIC_DIR}/config/elasticsearch.yml:ro
     secrets:
       - source: elasticsearch.keystore
@@ -281,17 +285,28 @@ services:
     volumes:
       - ./rita/config/config.yaml:/etc/rita/config.yaml:ro
       - ${LOGS_PATH}/zeek/logs:/logs:ro
+      - ${LOGS_PATH}/rita/logs/html-report.log:/html-report.log:rw
       - ./rita/mongo:/root:rw
 
   rita_web:
     container_name: rita_web
-    image: nginx:latest
+    build:
+      args:
+        - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
+      context: ./rita_web/
     volumes:
       - ./rita/mongo/dataset:/usr/share/nginx/html
     ports:
-      - 8000:80
+      - 8001:443
     depends_on:
       - rita
+    secrets:
+      - source: ca.crt
+        target: /etc/nginx/certs/ca.crt
+      - source: rita_web.cert
+        target: /etc/nginx/certs/rita_web.crt
+      - source: rita_web.key
+        target: /etc/nginx/certs/rita_web.key
 
 volumes:
   geoip:
